@@ -29,6 +29,18 @@ JagaPokok was created to solve that problem. My goal was to build a simple and p
 - 🔍 Plant identification using the camera (Work in Progress)
 - 🧪 Unit and integration test structure using Jest
 
+## Screenshots
+
+The screenshots below show the main JagaPokok user journey, including plant discovery, plant care information, personal plant management, reminders, and community interaction.
+
+| Home                                                         | Plant Details                                                           | My Plants                                                                |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| ![JagaPokok home screen](assets/screenshots/home-screen.png) | ![JagaPokok plant details screen](assets/screenshots/plant-details.png) | ![JagaPokok personal plant collection](assets/screenshots/my-plants.png) |
+
+| Care Reminders                                                       | Community                                                              |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| ![JagaPokok reminder screen](assets/screenshots/reminder-screen.png) | ![JagaPokok community screen](assets/screenshots/community-screen.png) |
+
 ## 🛠 Tech Stack
 
 | Technology              | Purpose                           |
