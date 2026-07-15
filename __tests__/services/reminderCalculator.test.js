@@ -1,69 +1,108 @@
-// __tests__/services/reminderCalculator.test.js
-import * as ReminderCalculator from '../../services/reminderCalculator';
-
-const { 
-  calculateReminderFrequencies, 
-  calculateNextDate, 
-  isReminderOverdue 
-} = ReminderCalculator;
+import {
+  calculateReminderFrequencies,
+  calculateNextDate,
+  isReminderOverdue,
+  getDaysUntilReminder,
+} from '../../services/reminderCalculator';
 
 describe('reminderCalculator', () => {
-  if (!calculateReminderFrequencies) {
-    it.todo('calculateReminderFrequencies not exported');
-    return;
-  }
-
   describe('calculateReminderFrequencies', () => {
-    test('calculates frequencies for plant object', () => {
+    test('calculates reminder frequencies for a low-water cactus', () => {
       const plant = {
         name: 'Cactus',
         waterNeeds: 'Low',
         repottingFrequency: 'Every 1-2 years',
       };
-      
-      const frequencies = calculateReminderFrequencies(plant);
-      
-      expect(typeof frequencies).toBe('object');
-      expect(frequencies).toHaveProperty('watering');
-      expect(frequencies).toHaveProperty('fertilizing');
-      expect(frequencies).toHaveProperty('rotating');
-      expect(frequencies).toHaveProperty('repotting');
+
+      expect(calculateReminderFrequencies(plant)).toEqual({
+        watering: 12,
+        fertilizing: 67,
+        rotating: 30,
+        repotting: 365,
+      });
+    });
+
+    test('calculates reminder frequencies for a high-water fern', () => {
+      const plant = {
+        name: 'Boston Fern',
+        waterNeeds: 'High',
+        repottingFrequency: 'Every 2-3 years',
+      };
+
+      expect(calculateReminderFrequencies(plant)).toEqual({
+        watering: 5,
+        fertilizing: 23,
+        rotating: 7,
+        repotting: 730,
+      });
+    });
+
+    test('uses default frequencies when plant information is missing', () => {
+      expect(calculateReminderFrequencies({})).toEqual({
+        watering: 7,
+        fertilizing: 30,
+        rotating: 14,
+        repotting: 365,
+      });
     });
   });
 
   describe('calculateNextDate', () => {
-    if (!calculateNextDate) {
-      it.todo('calculateNextDate not exported');
-      return;
-    }
+    test('adds the frequency and schedules the reminder at 9 AM', () => {
+      const result = calculateNextDate('2024-01-01T00:00:00.000Z', 7);
+      const nextDate = new Date(result);
 
-    test('returns date string', () => {
-      const lastDate = '2024-01-01T00:00:00.000Z';
-      const frequencyDays = 7;
-      
-      const nextDate = calculateNextDate(lastDate, frequencyDays);
-      expect(typeof nextDate).toBe('string');
-      // Should be a valid date
-      expect(() => new Date(nextDate)).not.toThrow();
+      expect(nextDate.getDate()).toBe(8);
+      expect(nextDate.getHours()).toBe(9);
+      expect(nextDate.getMinutes()).toBe(0);
     });
   });
 
   describe('isReminderOverdue', () => {
-    if (!isReminderOverdue) {
-      it.todo('isReminderOverdue not exported');
-      return;
-    }
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-01-10T12:00:00.000Z'));
+    });
 
-    test('returns boolean', () => {
-      const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + 7);
-      
-      const reminder = {
-        nextDate: futureDate.toISOString(),
-      };
-      
-      const result = isReminderOverdue(reminder);
-      expect(typeof result).toBe('boolean');
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('returns true for a reminder in the past', () => {
+      expect(
+        isReminderOverdue({ nextDate: '2026-01-09T12:00:00.000Z' })
+      ).toBe(true);
+    });
+
+    test('returns false for a reminder in the future', () => {
+      expect(
+        isReminderOverdue({ nextDate: '2026-01-11T12:00:00.000Z' })
+      ).toBe(false);
+    });
+
+    test('returns false when nextDate is missing', () => {
+      expect(isReminderOverdue({})).toBe(false);
+    });
+  });
+
+  describe('getDaysUntilReminder', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-01-10T00:00:00.000Z'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('returns the number of days until the reminder', () => {
+      expect(
+        getDaysUntilReminder({ nextDate: '2026-01-13T00:00:00.000Z' })
+      ).toBe(3);
+    });
+
+    test('returns null when nextDate is missing', () => {
+      expect(getDaysUntilReminder({})).toBeNull();
     });
   });
 });
