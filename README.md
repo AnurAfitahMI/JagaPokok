@@ -26,7 +26,7 @@ JagaPokok was created to solve that problem. My goal was to build a simple and p
 - 🌍 Community platform for sharing plant care experiences
 - ❤️ Like, comment, and interact with other users
 - 🔍 Plant identification using the camera (Work in Progress)
-- 🧪 Unit and integration test structure using Jest
+- 🧪 Jest unit tests for reminder calculations, plant classification, and user utilities
 
 ## Screenshots
 
@@ -183,7 +183,7 @@ Building JagaPokok independently gave me experience across the full mobile appli
 
 Through this project, I learned how to:
 
-- Structure a React Native application using reusable components, screens, hooks, and service modules
+- Structure a React Native application using reusable components, Expo Router routes, hooks, and service modules
 - Design and manage data using Cloud Firestore
 - Implement user authentication and image uploads with Firebase
 - Build automatic and customizable plant care reminders
@@ -205,7 +205,7 @@ Planned improvements for JagaPokok include:
 - Add editing and deletion controls for community posts
 - Improve image compression and upload performance
 - Add stronger form validation and error messages
-- Increase automated test coverage
+- Expand automated tests to more application areas
 - Improve accessibility and responsive layout
 - Prepare the application for production deployment
 
