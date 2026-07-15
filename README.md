@@ -156,11 +156,20 @@ A Firebase project and valid Firebase configuration are required for authenticat
 
 ## Lessons Learned
 
-JagaPokok was my first complete mobile application developed independently. From planning and database design to implementation, testing, and debugging, every stage of the project challenged me to learn new technologies and solve real-world problems.
+Building JagaPokok independently gave me experience across the full mobile application development process, from planning and database design to implementation, testing, debugging, and deployment preparation.
 
-There were moments when I wanted to give up, especially while working late nights to meet my final year project deadline. Completing the project taught me persistence, problem-solving, and the importance of breaking complex problems into manageable tasks. I learned how to organize application logic into reusable services, making the project easier to maintain and expand.
+Through this project, I learned how to:
 
-Looking back, I am proud that I transformed an idea inspired by my own gardening hobby into a fully functional mobile application.
+- Structure a React Native application using reusable components, screens, hooks, and service modules
+- Design and manage data using Cloud Firestore
+- Implement user authentication and image uploads with Firebase
+- Build automatic and customizable plant care reminders
+- Separate Firebase operations from user interface logic
+- Test application functions using Jest
+- Debug integration issues across navigation, storage, and cloud services
+- Manage a software project within a 12-week development timeline
+
+The project strengthened my problem-solving skills and taught me to break complex features into smaller, manageable tasks. It also helped me understand the importance of clean project structure, consistent naming, testing, and technical documentation.
 
 ## Future Improvements
 
