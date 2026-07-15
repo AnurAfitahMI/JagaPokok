@@ -49,8 +49,10 @@ The screenshots below show the main JagaPokok user journey, including plant disc
       <img src="assets/screenshots/my-plants.png" width="220" alt="JagaPokok personal plant collection">
     </td>
   </tr>
+  </table>
+  
+  <table>
   <tr>
-    <tr>
     <th width="50%">Care Reminders</th>
     <th width="50%">Community</th>
   </tr>
@@ -62,7 +64,6 @@ The screenshots below show the main JagaPokok user journey, including plant disc
       <img src="assets/screenshots/community-screen.png" width="220" alt="JagaPokok community screen">
     </td>
   </tr>
-
 </table>
 
 ## 🛠 Tech Stack
