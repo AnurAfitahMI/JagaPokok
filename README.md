@@ -173,11 +173,18 @@ The project strengthened my problem-solving skills and taught me to break comple
 
 ## Future Improvements
 
-- 🌿 AI-powered plant identification
-- ☁️ Cloud synchronization across multiple devices
-- 🤝 Enhanced community interaction
-- 🌦️ Weather-aware watering recommendations
-- 📊 Advanced plant growth analytics
+Planned improvements for JagaPokok include:
+
+- Complete the plant identification feature
+- Improve reminder reliability and notification handling
+- Add search and filtering for the plant database
+- Expand the plant information database
+- Add editing and deletion controls for community posts
+- Improve image compression and upload performance
+- Add stronger form validation and error messages
+- Increase automated test coverage
+- Improve accessibility and responsive layout
+- Prepare the application for production deployment
 
 ## 👨‍💻 Author
 
