@@ -86,6 +86,30 @@ flowchart TD
 - Cloud Firestore stores plant, reminder, growth, and community data.
 - Firebase Storage stores uploaded plant and community images.
 
+## 📁 Folder Structure
+
+```text
+JagaPokok/
+├── __tests__/             # Unit and integration tests
+├── app/                   # Expo Router routes and application pages
+├── assets/
+│   ├── images/            # Application images and visual assets
+│   └── screenshots/       # Screenshots used in this README
+├── components/            # Reusable user interface components
+├── constants/             # Shared constants and configuration values
+├── hooks/                 # Custom React hooks
+├── screens/               # Main application screens
+├── scripts/               # Project utility scripts
+├── services/              # Firebase and application service modules
+├── App.tsx                # Application entry file
+├── app.json               # Expo application configuration
+├── jest.config.js         # Jest test configuration
+├── package.json           # Dependencies and project scripts
+└── README.md              # Project documentation
+```
+
+The project separates interface components, application screens, reusable hooks, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
+
 ## 📂 Project Structure
 
 ```text
