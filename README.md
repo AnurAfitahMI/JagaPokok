@@ -21,7 +21,6 @@ JagaPokok was created to solve that problem. My goal was to build a simple and p
 - 👤 Personal plant collection
 - ⏰ Automatic care reminders based on plant requirements
 - ⚙️ Custom reminder scheduling
-- 🕒 Intelligent reminder scheduling based on each plant's care requirements.
 - 📷 Photo gallery to document plant growth over time
 - 📈 Track plant growth over time
 - 🌍 Community platform for sharing plant care experiences
@@ -154,9 +153,9 @@ npx expo start
 
 A Firebase project and valid Firebase configuration are required for authentication, database, and image-storage features.
 
-## Lessons Learned
+## 💡 Lessons Learned
 
-Building JagaPokok independently gave me experience across the full mobile application development process, from planning and database design to implementation, testing, debugging, and deployment preparation.
+Building JagaPokok independently gave me experience across the full mobile application development process, from planning and database design to implementation, testing, debugging, and documentation.
 
 Through this project, I learned how to:
 
@@ -169,9 +168,9 @@ Through this project, I learned how to:
 - Debug integration issues across navigation, storage, and cloud services
 - Manage a software project within a 12-week development timeline
 
-The project strengthened my problem-solving skills and taught me to break complex features into smaller, manageable tasks. It also helped me understand the importance of clean project structure, consistent naming, testing, and technical documentation.
+The project strengthened my problem-solving skills and taught me to break complex features into smaller, manageable tasks. It also reinforced the importance of clean project structure, consistent naming, testing, and technical documentation.
 
-## Future Improvements
+## 🚀 Future Improvements
 
 Planned improvements for JagaPokok include:
 
@@ -186,7 +185,7 @@ Planned improvements for JagaPokok include:
 - Improve accessibility and responsive layout
 - Prepare the application for production deployment
 
-## Author
+## 👤 Author
 
 Anur Afitah Mohd Isa
 
