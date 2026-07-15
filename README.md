@@ -50,19 +50,19 @@ The screenshots below show the main JagaPokok user journey, including plant disc
     </td>
   </tr>
   <tr>
-    <th>Care Reminders</th>
-    <th>Community</th>
-    <th></th>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="assets/screenshots/reminder-screen.png" width="220" alt="JagaPokok reminder screen">
-    </td>
-    <td align="center">
-      <img src="assets/screenshots/community-screen.png" width="220" alt="JagaPokok community screen">
-    </td>
-    <td></td>
-  </tr>
+    <tr>
+  <th>Care Reminders</th>
+  <th colspan="2">Community</th>
+</tr>
+<tr>
+  <td align="center">
+    <img src="assets/screenshots/reminder-screen.png" width="220" alt="JagaPokok reminder screen">
+  </td>
+  <td colspan="2" align="center">
+    <img src="assets/screenshots/community-screen.png" width="220" alt="JagaPokok community screen">
+  </td>
+</tr>
+
 </table>
 
 ## 🛠 Tech Stack
