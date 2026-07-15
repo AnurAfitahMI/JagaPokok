@@ -186,13 +186,11 @@ Planned improvements for JagaPokok include:
 - Improve accessibility and responsive layout
 - Prepare the application for production deployment
 
-## 👨‍💻 Author
+## Author
 
-**Anur Afitah Mohd Isa**
+Anur Afitah Mohd Isa
 
-Diploma in Information Technology
+Diploma in Information Technology graduate from the University of Malaya with a CGPA of 3.97/4.00. I am building my career in IT, digital project delivery, and project coordination.
 
-University of Malaya
-
-LinkedIn:
-https://linkedin.com/in/aam1
+- GitHub: [AnurAfitahMI](https://github.com/AnurAfitahMI)
+- LinkedIn: [linkedin.com/in/aam1](https://www.linkedin.com/in/aam1)
