@@ -47,11 +47,44 @@ The screenshots below show the main JagaPokok user journey, including plant disc
 | ----------------------- | --------------------------------- |
 | React Native            | Cross-platform mobile development |
 | Expo                    | Development framework             |
-| Firebase Authentication | User authorization                |
+| Firebase Authentication | User authentication               |
 | Cloud Firestore         | Database                          |
 | Firebase Storage        | Store uploaded plant images       |
 | JavaScript              | Application development           |
 | Expo Router             | Navigation                        |
+
+## 🏗 Application Architecture
+
+JagaPokok uses a modular architecture that separates the user interface, application logic, and Firebase services.
+
+```mermaid
+flowchart TD
+    A[User] --> B[React Native Screens]
+    B --> C[Expo Router]
+
+    C --> D[Authentication Service]
+    C --> E[Plant Service]
+    C --> F[Reminder Service]
+    C --> G[Community Service]
+    C --> H[Image Upload Service]
+
+    D --> I[Firebase Authentication]
+    E --> J[Cloud Firestore]
+    F --> J
+    G --> J
+    H --> K[Firebase Storage]
+
+    K --> J
+```
+
+### Architecture Overview
+
+- React Native screens provide the mobile user interface.
+- Expo Router manages navigation between screens.
+- Service modules handle authentication, plants, reminders, community features, and image uploads.
+- Firebase Authentication manages user accounts and login sessions.
+- Cloud Firestore stores plant, reminder, growth, and community data.
+- Firebase Storage stores uploaded plant and community images.
 
 ## 📂 Project Structure
 
