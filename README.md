@@ -32,13 +32,38 @@ JagaPokok was created to solve that problem. My goal was to build a simple and p
 
 The screenshots below show the main JagaPokok user journey, including plant discovery, plant care information, personal plant management, reminders, and community interaction.
 
-| Home                                                         | Plant Details                                                           | My Plants                                                                |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![JagaPokok home screen](assets/screenshots/home-screen.png) | ![JagaPokok plant details screen](assets/screenshots/plant-details.png) | ![JagaPokok personal plant collection](assets/screenshots/my-plants.png) |
-
-| Care Reminders                                                       | Community                                                              |
-| -------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| ![JagaPokok reminder screen](assets/screenshots/reminder-screen.png) | ![JagaPokok community screen](assets/screenshots/community-screen.png) |
+<table>
+  <tr>
+    <th>Home</th>
+    <th>Plant Details</th>
+    <th>My Plants</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/home-screen.png" width="220" alt="JagaPokok home screen">
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/plant-details.png" width="220" alt="JagaPokok plant details screen">
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/my-plants.png" width="220" alt="JagaPokok personal plant collection">
+    </td>
+  </tr>
+  <tr>
+    <th>Care Reminders</th>
+    <th>Community</th>
+    <th></th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="assets/screenshots/reminder-screen.png" width="220" alt="JagaPokok reminder screen">
+    </td>
+    <td align="center">
+      <img src="assets/screenshots/community-screen.png" width="220" alt="JagaPokok community screen">
+    </td>
+    <td></td>
+  </tr>
+</table>
 
 ## 🛠 Tech Stack
 
