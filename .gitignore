@@ -44,3 +44,6 @@ app-example
 
 # IDE
 .idea/
+
+# Test coverage
+coverage/
