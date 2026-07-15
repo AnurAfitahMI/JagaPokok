@@ -1,61 +1,151 @@
 // __tests__/services/plantTypeDetector.test.js
-// Add defensive checks
-import * as PlantTypeDetector from '../../services/plantTypeDetector';
-
-// Check if functions exist before testing
-const { detectPlantType, getMalaysiaAdjustment } = PlantTypeDetector;
+import {
+  detectPlantType,
+  getMalaysiaAdjustment,
+} from '../../services/plantTypeDetector';
 
 describe('plantTypeDetector', () => {
-  // Skip if functions don't exist
-  if (!detectPlantType || !getMalaysiaAdjustment) {
-    it.todo('Functions not exported from plantTypeDetector');
-    return;
-  }
-
   describe('detectPlantType', () => {
-    test('detects cactus as succulent', () => {
-      const plant = { name: 'Cactus', waterNeeds: 'Low' };
-      const result = detectPlantType(plant);
-      expect(typeof result).toBe('string');
-      // Accept either 'succulent' or whatever your function returns
-      expect(result).toBeDefined();
+    test('detects cactus by name as succulent', () => {
+      const plant = { name: 'Cactus' };
+
+      expect(detectPlantType(plant)).toBe('succulent');
     });
 
-    test('detects aloe as succulent', () => {
-      const plant = { name: 'Aloe Vera', waterNeeds: 'Low' };
-      const result = detectPlantType(plant);
-      expect(typeof result).toBe('string');
-      expect(result).toBeDefined();
+    test('detects cactus by family as succulent', () => {
+      const plant = {
+        name: 'Desert Plant',
+        family: 'Cactaceae',
+      };
+
+      expect(detectPlantType(plant)).toBe('succulent');
+    });
+
+    test('detects aloe by name as succulent', () => {
+      const plant = { name: 'Aloe Vera' };
+
+      expect(detectPlantType(plant)).toBe('succulent');
+    });
+
+    test('detects aloe by scientific name as succulent', () => {
+      const plant = {
+        name: 'Medicinal Plant',
+        scientificName: 'Aloe barbadensis miller',
+      };
+
+      expect(detectPlantType(plant)).toBe('succulent');
     });
 
     test('detects fern by name', () => {
-      const plant = { name: 'Boston Fern', waterNeeds: 'High' };
-      const result = detectPlantType(plant);
-      expect(typeof result).toBe('string');
-      expect(result).toBeDefined();
+      const plant = { name: 'Boston Fern' };
+
+      expect(detectPlantType(plant)).toBe('fern');
     });
 
-    test('returns something for unknown plants', () => {
-      const plant = { name: 'Unknown', waterNeeds: 'Moderate' };
-      const result = detectPlantType(plant);
-      expect(typeof result).toBe('string');
-      expect(result).toBeDefined();
+    test('detects palm by family', () => {
+      const plant = {
+        name: 'Areca Plant',
+        family: 'Arecaceae',
+      };
+
+      expect(detectPlantType(plant)).toBe('palm');
+    });
+
+    test('detects orchid as flowering', () => {
+      const plant = { name: 'Moth Orchid' };
+
+      expect(detectPlantType(plant)).toBe('flowering');
+    });
+
+    test('detects lily as flowering', () => {
+      const plant = { name: 'Peace Lily' };
+
+      expect(detectPlantType(plant)).toBe('flowering');
+    });
+
+    test('detects Araceae family as tropical', () => {
+      const plant = {
+        name: 'Monstera',
+        family: 'Araceae',
+      };
+
+      expect(detectPlantType(plant)).toBe('tropical');
+    });
+
+    test('detects low-water unknown plant as drought tolerant', () => {
+      const plant = {
+        name: 'Unknown Plant',
+        waterNeeds: 'Low',
+      };
+
+      expect(detectPlantType(plant)).toBe('drought_tolerant');
+    });
+
+    test('detects very-low-water unknown plant as drought tolerant', () => {
+      const plant = {
+        name: 'Unknown Plant',
+        waterNeeds: 'Very Low',
+      };
+
+      expect(detectPlantType(plant)).toBe('drought_tolerant');
+    });
+
+    test('detects high-water unknown plant as high humidity', () => {
+      const plant = {
+        name: 'Unknown Plant',
+        waterNeeds: 'High',
+      };
+
+      expect(detectPlantType(plant)).toBe('high_humidity');
+    });
+
+    test('returns moderate care when no known classification matches', () => {
+      const plant = {
+        name: 'Unknown Plant',
+        waterNeeds: 'Moderate',
+      };
+
+      expect(detectPlantType(plant)).toBe('moderate_care');
+    });
+
+    test('handles missing plant properties', () => {
+      expect(detectPlantType({})).toBe('moderate_care');
+    });
+
+    test('matches plant information without case sensitivity', () => {
+      const plant = {
+        name: 'BOSTON FERN',
+        waterNeeds: 'HIGH',
+      };
+
+      expect(detectPlantType(plant)).toBe('fern');
     });
   });
 
   describe('getMalaysiaAdjustment', () => {
-    test('returns object with water and fertilize properties', () => {
-      const adjustment = getMalaysiaAdjustment('succulent');
-      expect(typeof adjustment).toBe('object');
-      expect(adjustment).toHaveProperty('water');
-      expect(adjustment).toHaveProperty('fertilize');
-    });
+    test.each([
+      ['succulent', { water: -2, fertilize: 7 }],
+      ['drought_tolerant', { water: -2, fertilize: 7 }],
+      ['moderate_care', { water: 0, fertilize: 0 }],
+      ['high_humidity', { water: 1, fertilize: -3 }],
+      ['fern', { water: 2, fertilize: -5 }],
+      ['palm', { water: 0, fertilize: 0 }],
+      ['flowering', { water: 1, fertilize: -7 }],
+      ['tropical', { water: 1, fertilize: -5 }],
+    ])(
+      'returns the correct Malaysia adjustment for %s',
+      (plantType, expectedAdjustment) => {
+        expect(getMalaysiaAdjustment(plantType)).toEqual(
+          expectedAdjustment
+        );
+      }
+    );
 
-    test('returns default for unknown plant type', () => {
-      const adjustment = getMalaysiaAdjustment('unknown_type');
-      expect(typeof adjustment).toBe('object');
-      expect(adjustment).toHaveProperty('water');
-      expect(adjustment).toHaveProperty('fertilize');
+    test('returns zero adjustments for an unknown plant type', () => {
+      expect(getMalaysiaAdjustment('unknown_type')).toEqual({
+        water: 0,
+        fertilize: 0,
+      });
     });
   });
 });
