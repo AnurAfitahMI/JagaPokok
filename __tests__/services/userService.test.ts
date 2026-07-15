@@ -1,23 +1,18 @@
-const mockSetItem = jest.fn(() => Promise.resolve());
-const mockGetItem = jest.fn(() => Promise.resolve(null));
-const mockRemoveItem = jest.fn(() => Promise.resolve());
-const mockClear = jest.fn(() => Promise.resolve());
-
-// Mock AsyncStorage BEFORE importing the service
 jest.mock('@react-native-async-storage/async-storage', () => ({
-  setItem: mockSetItem,
-  getItem: mockGetItem,
-  removeItem: mockRemoveItem,
-  clear: mockClear,
+  __esModule: true,
+  default: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  },
 }));
 
-// Mock expo-application
 jest.mock('expo-application', () => ({
-  getIosIdForVendorAsync: jest.fn(() => Promise.resolve('test-ios-id')),
+  getIosIdForVendorAsync: jest.fn(),
   androidId: 'test-android-id',
 }));
 
-// Mock Platform
 jest.mock('react-native', () => ({
   Platform: {
     OS: 'ios',
@@ -27,66 +22,134 @@ jest.mock('react-native', () => ({
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Application from 'expo-application';
 import { Platform } from 'react-native';
-import { generateDeviceId, getUserId, getUserName } from '../../services/userService';
+import {
+  generateDeviceId,
+  getUserId,
+  getUserName,
+} from '../../services/userService';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
-);
+const mockGetItem = AsyncStorage.getItem as jest.Mock;
+const mockGetIosIdForVendor =
+  Application.getIosIdForVendorAsync as jest.Mock;
 
 describe('userService', () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    Platform.OS = 'ios';
+
+    consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+    jest.restoreAllMocks();
   });
 
   describe('getUserId', () => {
-    test('returns user ID from AsyncStorage', async () => {
-      const mockUserId = 'user_12345';
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(mockUserId);
+    test('returns the stored user ID', async () => {
+      mockGetItem.mockResolvedValue('user_12345');
 
-      const result = await getUserId();
-
-      expect(AsyncStorage.getItem).toHaveBeenCalledWith('userId');
-      expect(result).toBe(mockUserId);
+      await expect(getUserId()).resolves.toBe('user_12345');
+      expect(mockGetItem).toHaveBeenCalledWith('userId');
     });
 
     test('returns null when no user ID exists', async () => {
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
+      mockGetItem.mockResolvedValue(null);
 
-      const result = await getUserId();
+      await expect(getUserId()).resolves.toBeNull();
+      expect(mockGetItem).toHaveBeenCalledWith('userId');
+    });
 
-      expect(result).toBe(null);
+    test('returns null when AsyncStorage fails', async () => {
+      const storageError = new Error('Storage unavailable');
+      mockGetItem.mockRejectedValue(storageError);
+
+      await expect(getUserId()).resolves.toBeNull();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error getting user ID:',
+        storageError
+      );
     });
   });
 
   describe('getUserName', () => {
-    test('returns user name from AsyncStorage', async () => {
-      const mockUserName = 'John Doe';
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(mockUserName);
+    test('returns the stored user name', async () => {
+      mockGetItem.mockResolvedValue('John Doe');
 
-      const result = await getUserName();
+      await expect(getUserName()).resolves.toBe('John Doe');
+      expect(mockGetItem).toHaveBeenCalledWith('userName');
+    });
 
-      expect(result).toBe(mockUserName);
+    test('returns null when no user name exists', async () => {
+      mockGetItem.mockResolvedValue(null);
+
+      await expect(getUserName()).resolves.toBeNull();
+      expect(mockGetItem).toHaveBeenCalledWith('userName');
+    });
+
+    test('returns null when AsyncStorage fails', async () => {
+      const storageError = new Error('Storage unavailable');
+      mockGetItem.mockRejectedValue(storageError);
+
+      await expect(getUserName()).resolves.toBeNull();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error getting user name:',
+        storageError
+      );
     });
   });
 
   describe('generateDeviceId', () => {
-    test('generates iOS device ID', async () => {
+    test('generates an ID from the iOS vendor ID', async () => {
       Platform.OS = 'ios';
-      const mockIosId = 'ios-device-12345';
-      (Application.getIosIdForVendorAsync as jest.Mock).mockResolvedValue(mockIosId);
+      mockGetIosIdForVendor.mockResolvedValue('ios-device-12345');
 
-      const result = await generateDeviceId();
-
-      expect(result).toBe(`user_${mockIosId}`);
+      await expect(generateDeviceId()).resolves.toBe(
+        'user_ios-device-12345'
+      );
+      expect(mockGetIosIdForVendor).toHaveBeenCalledTimes(1);
     });
 
-    test('generates fallback ID when device ID is null', async () => {
+    test('generates an ID from the Android ID', async () => {
+      Platform.OS = 'android';
+
+      await expect(generateDeviceId()).resolves.toBe(
+        'user_test-android-id'
+      );
+      expect(mockGetIosIdForVendor).not.toHaveBeenCalled();
+    });
+
+    test('generates a deterministic fallback when the device ID is missing', async () => {
       Platform.OS = 'ios';
-      (Application.getIosIdForVendorAsync as jest.Mock).mockResolvedValue(null);
+      mockGetIosIdForVendor.mockResolvedValue(null);
 
-      const result = await generateDeviceId();
+      jest.spyOn(Date, 'now').mockReturnValue(1234567890);
+      jest.spyOn(Math, 'random').mockReturnValue(0.5);
 
-      expect(result).toMatch(/^user_device_\d+_[a-z0-9]+$/);
+      await expect(generateDeviceId()).resolves.toBe(
+        'user_device_1234567890_i'
+      );
+    });
+
+    test('generates a fallback ID when device lookup fails', async () => {
+      Platform.OS = 'ios';
+      const deviceError = new Error('Device lookup failed');
+      mockGetIosIdForVendor.mockRejectedValue(deviceError);
+
+      jest.spyOn(Date, 'now').mockReturnValue(1234567890);
+      jest.spyOn(Math, 'random').mockReturnValue(0.5);
+
+      await expect(generateDeviceId()).resolves.toBe(
+        'user_1234567890_i'
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error generating device ID:',
+        deviceError
+      );
     });
   });
 });
