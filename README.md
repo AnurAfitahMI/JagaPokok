@@ -110,19 +110,6 @@ JagaPokok/
 
 The project separates interface components, application screens, reusable hooks, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
 
-## 📂 Project Structure
-
-```text
-app/                Application screens and navigation
-components/         Reusable UI components
-services/           Firebase and business logic
-screens/            Feature-specific screens
-assets/             Images and application resources
-hooks/              Custom React hooks
-constants/          Theme and configuration
-__tests__/          Unit and integration tests
-```
-
 ## 🚀 Installation
 
 Clone the repository.
