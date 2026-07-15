@@ -110,25 +110,49 @@ JagaPokok/
 
 The project separates interface components, application screens, reusable hooks, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
 
-## 🚀 Installation
+## ⚙️ Installation
 
-Clone the repository.
+### Prerequisites
+
+Before running the project, install:
+
+- Node.js
+- npm
+- Expo Go on a mobile device, or an Android or iOS emulator
+
+### Setup
+
+1. Clone the repository.
 
 ```bash
 git clone https://github.com/AnurAfitahMI/JagaPokok.git
 ```
 
-Install dependencies.
+2. Open the project folder.
+
+```bash
+cd JagaPokok
+```
+
+3. Install the project dependencies.
 
 ```bash
 npm install
 ```
 
-Start the Expo development server.
+4. Start the Expo development server.
 
 ```bash
 npx expo start
 ```
+
+5. Run the application using one of these options:
+
+- Scan the QR code using Expo Go
+- Press `a` to open the Android emulator
+- Press `i` to open the iOS simulator
+
+A Firebase project and valid Firebase configuration are required for authentication, database, and image-storage features.
 
 ## Lessons Learned
 
