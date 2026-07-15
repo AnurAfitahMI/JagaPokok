@@ -115,7 +115,7 @@ flowchart TD
 
 ```text
 JagaPokok/
-├── __tests__/             # Unit and integration tests
+├── __tests__/             # Jest unit tests
 ├── app/                   # Expo Router routes and application pages
 ├── assets/
 │   ├── images/            # Application images and visual assets
@@ -123,17 +123,15 @@ JagaPokok/
 ├── components/            # Reusable user interface components
 ├── constants/             # Shared constants and configuration values
 ├── hooks/                 # Custom React hooks
-├── screens/               # Main application screens
 ├── scripts/               # Project utility scripts
 ├── services/              # Firebase and application service modules
-├── App.tsx                # Application entry file
 ├── app.json               # Expo application configuration
 ├── jest.config.js         # Jest test configuration
 ├── package.json           # Dependencies and project scripts
 └── README.md              # Project documentation
 ```
 
-The project separates interface components, application screens, reusable hooks, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
+The project separates Expo Router pages, reusable interface components, custom hooks, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
 
 ## ⚙️ Installation
 
