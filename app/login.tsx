@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Application from 'expo-application'; // FIXED IMPORT
 import { useRouter } from 'expo-router';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -29,46 +28,23 @@ export default function LoginScreen() {
     checkExistingUser();
   }, []);
 
-  // Get device ID using expo-application
-  const getDeviceId = async (): Promise<string> => {
-    try {
-      let deviceId: string | null = null;
-      
-      if (Platform.OS === 'ios') {
-        deviceId = await Application.getIosIdForVendorAsync();
-      } else {
-        deviceId = Application.androidId;
-      }
-      
-      // Fallback if device ID is null
-      if (!deviceId) {
-        deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      }
-      
-      return deviceId;
-    } catch (error) {
-      console.error('Error getting device ID:', error);
-      // Fallback to a random ID
-      return `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-  };
-
   const checkExistingUser = async () => {
     try {
-      // Check if user already logged in
       const savedUserId = await AsyncStorage.getItem('userId');
       const savedUserName = await AsyncStorage.getItem('userName');
-      
-      if (savedUserId && savedUserName) {
-        // Auto-fill name
+      const currentUser = auth.currentUser;
+
+      if (currentUser && savedUserName) {
+        if (savedUserId && savedUserId !== currentUser.uid) {
+          await AsyncStorage.setItem('legacyUserId', savedUserId);
+        }
+
+        await AsyncStorage.setItem('userId', currentUser.uid);
         setName(savedUserName);
-        
-        // Optional: Auto-navigate after a short delay
-        setTimeout(() => {
-          router.replace('/(tabs)');
-        }, 1500);
+        router.replace('/(tabs)');
+        return;
       }
-      
+
       setCheckingExistingUser(false);
     } catch (error) {
       console.error('Error checking existing user:', error);
@@ -85,59 +61,51 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // Get device ID for persistent user identification
-      const deviceId = await getDeviceId();
-      const userId = `user_${deviceId}`;
-      
-      console.log('Using device-based user ID:', userId);
+      const previousUserId = await AsyncStorage.getItem('userId');
+      const userCredential = auth.currentUser
+        ? { user: auth.currentUser }
+        : await signInAnonymously(auth);
 
-      // Save user ID and name locally
+      const userId = userCredential.user.uid;
+
+      console.log('Using Firebase anonymous UID:', userId);
+
+      if (previousUserId && previousUserId !== userId) {
+        await AsyncStorage.setItem('legacyUserId', previousUserId);
+      }
+
       await AsyncStorage.setItem('userId', userId);
       await AsyncStorage.setItem('userName', name.trim());
 
-      // Sign in anonymously with Firebase (for other Firebase features)
-      try {
-        await signInAnonymously(auth);
-        console.log('Firebase anonymous auth completed');
-      } catch (authError) {
-        console.warn('Firebase auth failed:', authError);
-        // Continue anyway - we have our device-based ID
-      }
-
-      // Save user profile to Firestore
       const userRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userRef);
-      
+
       const userData = {
         name: name.trim(),
-        deviceId: deviceId,
         platform: Platform.OS,
         appVersion: '1.0.0',
         updatedAt: new Date().toISOString(),
       };
 
       if (!userDoc.exists()) {
-        // Create new user
         await setDoc(userRef, {
           ...userData,
           createdAt: new Date().toISOString(),
         });
         console.log('Created new user profile in Firestore');
       } else {
-        // Update existing user
         await setDoc(userRef, userData, { merge: true });
         console.log('Updated user profile in Firestore');
       }
 
-      // Navigate to home
       router.replace('/(tabs)');
-      
     } catch (error) {
       console.error('Error in login process:', error);
       Alert.alert(
-        'Error', 
-        'Failed to save your profile. Please try again.'
+        'Error',
+        'Failed to sign in or save your profile. Please try again.'
       );
+    } finally {
       setLoading(false);
     }
   };
