@@ -10,7 +10,7 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 jest.mock('expo-application', () => ({
   getIosIdForVendorAsync: jest.fn(),
-  androidId: 'test-android-id',
+  getAndroidId: jest.fn(() => 'test-android-id'),
 }));
 
 jest.mock('react-native', () => ({

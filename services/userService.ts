@@ -29,7 +29,7 @@ export const generateDeviceId = async (): Promise<string> => {
     if (Platform.OS === 'ios') {
       deviceId = await Application.getIosIdForVendorAsync();
     } else {
-      deviceId = Application.androidId;
+      deviceId = Application.getAndroidId();
     }
     
     if (!deviceId) {

@@ -50,3 +50,7 @@ coverage/
 
 # Local Firebase rules backup
 firestore.rules.backup
+
+# Temporary local source backups
+*.tsx.backup
+eslint.config.js.backup

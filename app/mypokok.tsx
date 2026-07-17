@@ -807,7 +807,7 @@ console.log('Fetching MyPokok plants for user:', userId);
             onPress={confirmDeletePlant}
           >
             <MaterialCommunityIcons name="trash-can-outline" size={18} color={Colors.white} />
-            <Text style={styles.deleteButtonText}>Remove</Text>
+            <Text style={styles.deleteButtonModalText}>Remove</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1370,7 +1370,7 @@ cancelButtonText: {
 deleteButtonModal: {
   backgroundColor: Colors.error,
 },
-deleteButtonText: {
+deleteButtonModalText: {
   color: Colors.white, // Changed from Colors.text to white for better visibility
   fontSize: 16,
   fontWeight: '600',
@@ -1393,14 +1393,6 @@ completeButtonTextSmall: {
   fontSize: 16,
   fontWeight: '600',
 },
-  deleteButtonModal: {
-    backgroundColor: Colors.error,
-  },
-  deleteButtonText: {
-    color: Colors.text,
-    fontSize: 16,
-    fontWeight: '600',
-  },
   reminderDateText: {
     fontSize: 14,
     color: Colors.text,
