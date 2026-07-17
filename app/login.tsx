@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { signInAnonymously } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import {
@@ -23,34 +23,41 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [checkingExistingUser, setCheckingExistingUser] = useState(true);
   const router = useRouter();
-
   useEffect(() => {
-    checkExistingUser();
-  }, []);
+    let active = true;
 
-  const checkExistingUser = async () => {
-    try {
-      const savedUserId = await AsyncStorage.getItem('userId');
-      const savedUserName = await AsyncStorage.getItem('userName');
-      const currentUser = auth.currentUser;
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      try {
+        const savedUserId = await AsyncStorage.getItem('userId');
+        const savedUserName = await AsyncStorage.getItem('userName');
 
-      if (currentUser && savedUserName) {
-        if (savedUserId && savedUserId !== currentUser.uid) {
-          await AsyncStorage.setItem('legacyUserId', savedUserId);
+        if (!active) {
+          return;
         }
 
-        await AsyncStorage.setItem('userId', currentUser.uid);
-        setName(savedUserName);
-        router.replace('/(tabs)');
-        return;
-      }
+        if (currentUser && savedUserName) {
+          if (savedUserId && savedUserId !== currentUser.uid) {
+            await AsyncStorage.setItem('legacyUserId', savedUserId);
+          }
 
-      setCheckingExistingUser(false);
-    } catch (error) {
-      console.error('Error checking existing user:', error);
-      setCheckingExistingUser(false);
-    }
-  };
+          await AsyncStorage.setItem('userId', currentUser.uid);
+          setName(savedUserName);
+          router.replace('/(tabs)');
+          return;
+        }
+
+        setCheckingExistingUser(false);
+      } catch (error) {
+        console.error('Error checking existing user:', error);
+        setCheckingExistingUser(false);
+      }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, [router]);
 
   const handleContinue = async () => {
     if (name.trim().length === 0) {
@@ -154,7 +161,7 @@ export default function LoginScreen() {
         />
 
         <Text style={styles.infoText}>
-          Your data will be saved to this device using a unique device ID.
+          Your plant data will be linked to your JagaPokok profile.
         </Text>
 
         <TouchableOpacity 
