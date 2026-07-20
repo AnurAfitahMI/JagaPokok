@@ -1,0 +1,154 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /plants/{plantId} {
+      allow read: if isSignedIn();
+    }
+
+    match /users/{uid} {
+      allow read, create, update: if isOwner(uid);
+
+      match /mypokok/{plantId} {
+        allow read, create, update, delete: if isOwner(uid);
+      }
+    }
+
+    match /communityPosts/{postId} {
+      function isValidNewPost() {
+        return request.resource.data.keys().hasAll([
+            'username',
+            'avatar',
+            'content',
+            'timestamp',
+            'likes',
+            'comments',
+            'likedBy',
+            'image',
+            'userId'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'username',
+            'avatar',
+            'content',
+            'timestamp',
+            'likes',
+            'comments',
+            'likedBy',
+            'image',
+            'userId'
+          ])
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.username is string
+          && request.resource.data.username.size() > 0
+          && request.resource.data.username.size() <= 80
+          && request.resource.data.avatar == '🌱'
+          && request.resource.data.content is string
+          && request.resource.data.content.size() > 0
+          && request.resource.data.content.size() <= 1000
+          && request.resource.data.timestamp is string
+          && request.resource.data.likes == 0
+          && request.resource.data.comments is list
+          && request.resource.data.comments.size() == 0
+          && request.resource.data.likedBy is list
+          && request.resource.data.likedBy.size() == 0
+          && (
+            request.resource.data.image == null
+            || request.resource.data.image is string
+          );
+      }
+
+      function isValidLikeUpdate() {
+        let oldLikedBy = resource.data.likedBy;
+        let newLikedBy = request.resource.data.likedBy;
+        let added = newLikedBy.toSet().difference(oldLikedBy.toSet());
+        let removed = oldLikedBy.toSet().difference(newLikedBy.toSet());
+
+        return request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['likes', 'likedBy'])
+          && resource.data.likes is int
+          && request.resource.data.likes is int
+          && oldLikedBy is list
+          && newLikedBy is list
+          && oldLikedBy.size() == oldLikedBy.toSet().size()
+          && newLikedBy.size() == newLikedBy.toSet().size()
+          && resource.data.likes == oldLikedBy.size()
+          && request.resource.data.likes == newLikedBy.size()
+          && (
+            (
+              !(request.auth.uid in oldLikedBy)
+              && request.auth.uid in newLikedBy
+              && added == [request.auth.uid].toSet()
+              && removed.size() == 0
+              && newLikedBy.size() == oldLikedBy.size() + 1
+              && request.resource.data.likes == resource.data.likes + 1
+            )
+            ||
+            (
+              request.auth.uid in oldLikedBy
+              && !(request.auth.uid in newLikedBy)
+              && removed == [request.auth.uid].toSet()
+              && added.size() == 0
+              && newLikedBy.size() == oldLikedBy.size() - 1
+              && request.resource.data.likes == resource.data.likes - 1
+            )
+          );
+      }
+
+      function isValidCommentUpdate() {
+        let oldComments = resource.data.comments;
+        let newComments = request.resource.data.comments;
+        let comment = newComments[oldComments.size()];
+
+        return request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['comments'])
+          && oldComments is list
+          && newComments is list
+          && newComments.size() == oldComments.size() + 1
+          && newComments.size() <= 200
+          && newComments == oldComments.concat([comment])
+          && comment is map
+          && comment.keys().hasAll([
+            'id',
+            'userId',
+            'username',
+            'avatar',
+            'content',
+            'timestamp'
+          ])
+          && comment.keys().hasOnly([
+            'id',
+            'userId',
+            'username',
+            'avatar',
+            'content',
+            'timestamp'
+          ])
+          && comment.id is string
+          && comment.id.size() > 0
+          && comment.userId == request.auth.uid
+          && comment.username is string
+          && comment.username.size() > 0
+          && comment.username.size() <= 80
+          && comment.avatar == '🌱'
+          && comment.content is string
+          && comment.content.size() > 0
+          && comment.content.size() <= 500
+          && comment.timestamp is string;
+      }
+
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidNewPost();
+      allow update: if isSignedIn()
+        && (isValidLikeUpdate() || isValidCommentUpdate());
+    }
+  }
+}

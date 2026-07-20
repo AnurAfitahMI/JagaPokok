@@ -54,3 +54,6 @@ firestore.rules.backup
 # Temporary local source backups
 *.tsx.backup
 eslint.config.js.backup
+
+# Firebase emulator
+firestore-debug.log

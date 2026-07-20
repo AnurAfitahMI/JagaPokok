@@ -8,6 +8,7 @@ module.exports = {
   testPathIgnorePatterns: [
     "/node_modules/",
     "/android/",
-    "/ios/"
+    "/ios/",
+    "/__tests__/firebase/"
   ]
 };
