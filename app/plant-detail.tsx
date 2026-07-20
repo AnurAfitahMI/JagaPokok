@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import BackButton from '../components/BackButton';
 import { Colors } from '../constants/Colors';
-import { auth, db } from '../services/firebase';
+import { db } from '../services/firebase';
 import { createInitialReminders } from '../services/reminderCalculator';
 
 export default function PlantDetailScreen() {
@@ -57,11 +57,6 @@ export default function PlantDetailScreen() {
 
   // Save plant to MyPokok in Firestore
   const handleAddToMyPokok = async () => {
-  console.log('=== ADD TO MYPOKOK DEBUG ===');
-  console.log('Current user:', auth.currentUser);
-  console.log('User UID:', auth.currentUser?.uid);
-  console.log('Plant to add:', plant);
-
   try {
     const userId = await AsyncStorage.getItem('userId');
     if (!userId) {
@@ -111,8 +106,6 @@ export default function PlantDetailScreen() {
               const mypokokRef = doc(db, 'users', userId, 'mypokok', plant.id);
               
               await setDoc(mypokokRef, plantData);
-
-              console.log('Plant added to MyPokok with reminders:', reminders.length);
 
               // Show success message and navigate
               Alert.alert(
