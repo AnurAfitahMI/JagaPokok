@@ -20,7 +20,7 @@ import {
 } from 'react-native';
 import BackButton from '../components/BackButton';
 import { Colors } from '../constants/Colors';
-import { db, storage } from '../services/firebase';
+import { auth, db, storage } from '../services/firebase';
 
 export default function CommunityScreen() {
   const router = useRouter();
@@ -171,49 +171,23 @@ export default function CommunityScreen() {
     }
   };
 
-  const uploadImageToFirebase = async (localUri) => {
-  try {
-    console.log('=== UPLOAD DEBUG START ===');
-    console.log('1. Local URI:', localUri);
-    
-    // Convert to blob
-    console.log('2. Converting to blob...');
-    const response = await fetch(localUri);
-    const blob = await response.blob();
-    console.log('3. Blob created:', blob.size, 'bytes, type:', blob.type);
-    
-    // Create filename
-    const filename = `community/${Date.now()}_test.jpg`;
-    console.log('4. Filename:', filename);
-    
-    // Create storage reference
-    console.log('5. Creating storage ref...');
-    const storageRef = ref(storage, filename);
-    console.log('6. Storage ref created:', storageRef);
-    console.log('7. Ref full path:', storageRef.fullPath);
-    
-    // Upload
-    console.log('8. Starting upload...');
-    const uploadResult = await uploadBytes(storageRef, blob);
-    console.log('9. Upload completed!');
-    console.log('10. Upload metadata:', uploadResult.metadata);
-    
-    // Get URL
-    console.log('11. Getting download URL...');
-    const downloadURL = await getDownloadURL(uploadResult.ref);
-    console.log('12. Download URL:', downloadURL);
-    
-    console.log('=== UPLOAD DEBUG END ===');
-    return downloadURL;
-    
-  } catch (error) {
-    console.error('=== UPLOAD ERROR ===');
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
-    console.error('Full error:', error);
-    throw error;
-  }
-};
+  const uploadImageToFirebase = async (localUri, userId) => {
+    try {
+      const response = await fetch(localUri);
+      const blob = await response.blob();
+      const filename = `community/${userId}/${Date.now()}.jpg`;
+      const storageRef = ref(storage, filename);
+      const uploadResult = await uploadBytes(storageRef, blob);
+
+      return await getDownloadURL(uploadResult.ref);
+    } catch (error) {
+      console.error('Error uploading image:', {
+        code: error?.code,
+        message: error?.message,
+      });
+      throw error;
+    }
+  };
 
 const handleCreatePost = async () => {
   if (newPostText.trim().length === 0) {
@@ -225,15 +199,17 @@ const handleCreatePost = async () => {
 
   try {
     // Get current user info
-    const userId = await AsyncStorage.getItem('userId');
+    const userId = auth.currentUser?.uid;
     const userName = await AsyncStorage.getItem('userName') || 'Anonymous';
+    if (!userId) {
+      Alert.alert('Error', 'You must be signed in to create a post.');
+      return;
+    }
 
     // Handle image upload
     let imageUrl = null;
     if (selectedImage) {
-      console.log('Uploading image...');
-      imageUrl = await uploadImageToFirebase(selectedImage);
-      console.log('Image uploaded successfully:', imageUrl);
+      imageUrl = await uploadImageToFirebase(selectedImage, userId);
     }
 
     // Create post object
@@ -249,12 +225,9 @@ const handleCreatePost = async () => {
       userId: userId,
     };
 
-    console.log('💾 Saving post to Firestore:', newPost);
-
     // Save to Firestore
     const postsRef = collection(db, 'communityPosts');
     const docRef = await addDoc(postsRef, newPost);
-    console.log('✅ Post saved with ID:', docRef.id);
 
     // Update local state with the new post ID
     const postWithId = {
@@ -280,8 +253,11 @@ const handleCreatePost = async () => {
   // 3. FIX HEART CLICK: Change color and update count
   const handleLike = async (postId) => {
     try {
-      const userId = await AsyncStorage.getItem('userId');
-      if (!userId) return;
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        Alert.alert('Authentication Required', 'Please sign in before liking a post.');
+        return;
+      }
 
       const post = posts.find(p => p.id === postId);
       if (!post) return;
@@ -343,7 +319,12 @@ const handleCreatePost = async () => {
     setPostingComment(true);
     
     try {
-      const userId = await AsyncStorage.getItem('userId');
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        Alert.alert('Authentication Required', 'Please sign in before commenting.');
+        return;
+      }
+
       const userName = await AsyncStorage.getItem('userName') || 'Anonymous';
 
       const comment = {
@@ -432,7 +413,7 @@ const handleCreatePost = async () => {
 
   // Render each post
   const renderPost = ({ item }) => {
-    const userId = AsyncStorage.getItem('userId'); // You might want to get this synchronously
+    const userId = auth.currentUser?.uid;
     const isLiked = item.likedBy?.includes(userId) || likedPosts[item.id];
 
     return (
