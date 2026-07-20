@@ -8,4 +8,5 @@ export const Colors = {
   textSecondary: '#565756',
   inputBg: '#f7f9f7',      // Light input background
   button: '#41a86b',
+  error: '#C62828',
 };

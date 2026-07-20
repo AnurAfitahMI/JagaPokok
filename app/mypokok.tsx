@@ -503,8 +503,11 @@ console.log('Fetching MyPokok plants for user:', userId);
       const user = auth.currentUser;
       if (!user) return;
 
-      // Calculate snoozed date
-      const newDate = new Date();
+      // Snooze from the scheduled date, or from now if the reminder is overdue
+      const existingNextDate = new Date(selectedReminder.nextDate);
+      const now = new Date();
+      const snoozeFrom = existingNextDate > now ? existingNextDate : now;
+      const newDate = new Date(snoozeFrom);
       newDate.setHours(newDate.getHours() + hours);
       const newNextDate = newDate.toISOString();
 
@@ -1386,10 +1389,10 @@ cancelButtonTextSmall: {
   fontWeight: '600',
 },
 completeButtonSmall: {
-  backgroundColor: Colors.error,
+  backgroundColor: Colors.primary,
 },
 completeButtonTextSmall: {
-  color: Colors.text,
+  color: Colors.white,
   fontSize: 16,
   fontWeight: '600',
 },
