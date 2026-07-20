@@ -253,8 +253,6 @@ if (!userId) {
   return;
 }
 
-console.log('Fetching MyPokok plants for user:', userId);
-
       const mypokokRef = collection(db, 'users', userId, 'mypokok');
       const q = query(mypokokRef, orderBy('addedAt', 'desc'));
       const snapshot = await getDocs(q);
@@ -411,8 +409,6 @@ console.log('Fetching MyPokok plants for user:', userId);
       Alert.alert('Error', 'User not found. Please log in again.');
       return;
     }
-
-    console.log('Deleting plant:', plantToDelete.id, 'for user:', userId);
 
     // Delete from Firestore
     await deleteDoc(doc(db, 'users', userId, 'mypokok', plantToDelete.id));

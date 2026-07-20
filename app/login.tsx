@@ -75,8 +75,6 @@ export default function LoginScreen() {
 
       const userId = userCredential.user.uid;
 
-      console.log('Using Firebase anonymous UID:', userId);
-
       if (previousUserId && previousUserId !== userId) {
         await AsyncStorage.setItem('legacyUserId', previousUserId);
       }

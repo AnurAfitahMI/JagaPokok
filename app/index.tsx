@@ -14,7 +14,6 @@ export default function Index() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, go to home
-        console.log('User already signed in:', user.uid);
         router.replace('/(tabs)');
       } else {
         // No user, go to splash then login

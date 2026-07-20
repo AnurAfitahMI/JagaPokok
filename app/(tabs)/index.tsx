@@ -20,7 +20,6 @@ export default function HomeScreen() {
       // FIRST: Try to get username from AsyncStorage (from login)
       const storedName = await AsyncStorage.getItem('userName');
       if (storedName) {
-        console.log('Got username from AsyncStorage:', storedName);
         setUsername(storedName);
         setLoading(false);
         return;
