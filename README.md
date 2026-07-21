@@ -4,11 +4,11 @@
 
 JagaPokok is a cross-platform indoor plant care application built with React Native, Expo, Firebase Authentication, and Cloud Firestore.
 
-The application helps users manage indoor plants through personalized plant tracking, intelligent care reminders, and growth monitoring. It combines practical plant care information with a simple and intuitive mobile experience for both beginners and plant enthusiasts.
+The application helps users manage indoor plants through personal plant collections and intelligent care reminders. It combines practical plant care information with a simple and intuitive mobile experience for both beginners and plant enthusiasts.
 
 ## Why I Built JagaPokok
 
-I enjoy gardening and caring for indoor plants, but I often found myself forgetting when I last watered or fertilized them. As my collection grew, it became difficult to keep track of each plant's care schedule and monitor their growth over time.
+I enjoy gardening and caring for indoor plants, but I often found myself forgetting when I last watered or fertilized them. As my collection grew, it became difficult to keep track of each plant's care schedule.
 
 JagaPokok was created to solve that problem. My goal was to build a simple and practical mobile application that helps plant owners organize plant care and manage care reminders in one place.
 
@@ -78,36 +78,31 @@ The screenshots below show the main JagaPokok user journey, including plant disc
 
 ## 🏗 Application Architecture
 
-JagaPokok uses a modular architecture that separates the user interface, application logic, and Firebase services.
+JagaPokok uses Expo Router screens, reusable components, application services, and Firebase backend services.
 
 ```mermaid
 flowchart TD
     A[User] --> B[React Native Screens]
     B --> C[Expo Router]
 
-    C --> D[Authentication Service]
-    C --> E[Plant Service]
-    C --> F[Reminder Service]
-    C --> G[Community Service]
-    C --> H[Image Upload Service]
+    C --> D[Authentication]
+    C --> E[Plant Catalogue]
+    C --> F[Care Reminders]
+    C --> G[Community]
 
-    D --> I[Firebase Authentication]
-    E --> J[Cloud Firestore]
-    F --> J
-    G --> J
-    H --> K[Firebase Storage]
-
-    K --> J
+    D --> H[Firebase Authentication]
+    E --> I[Cloud Firestore]
+    F --> I
+    G --> I
 ```
 
 ### Architecture Overview
 
 - React Native screens provide the mobile user interface.
 - Expo Router manages navigation between screens.
-- Service modules handle authentication, plants, reminders, community features, and image uploads.
-- Firebase Authentication manages user accounts and login sessions.
-- Cloud Firestore stores plant, reminder, growth, and community data.
-- Firebase Storage stores uploaded plant and community images.
+- Reusable components and service modules support application logic.
+- Firebase Authentication manages persistent anonymous user sessions.
+- Cloud Firestore stores plant information, user profiles, personal plant collections, reminders, and community posts.
 
 ## 📁 Folder Structure
 
@@ -173,7 +168,7 @@ npx expo start
 - Press `a` to open the Android emulator
 - Press `i` to open the iOS simulator
 
-A Firebase project and valid Firebase configuration are required for authentication, database, and image-storage features.
+A Firebase project and valid Firebase configuration are required for authentication and database features.
 
 ## 💡 Lessons Learned
 
@@ -183,25 +178,28 @@ Through this project, I learned how to:
 
 - Structure a React Native application using reusable components, Expo Router routes, hooks, and service modules
 - Design and manage data using Cloud Firestore
-- Implement user authentication and image uploads with Firebase
+- Implement persistent anonymous authentication and Cloud Firestore data operations
 - Build automatic and customizable plant care reminders
 - Separate Firebase operations from user interface logic
 - Test application functions using Jest
-- Debug integration issues across navigation, storage, and cloud services
+- Write and validate Firestore security rules using emulator-based integration tests
+- Debug integration issues across navigation, authentication, and cloud database services
 - Manage a software project within a 12-week development timeline
 
 The project strengthened my problem-solving skills and taught me to break complex features into smaller, manageable tasks. It also reinforced the importance of clean project structure, consistent naming, testing, and technical documentation.
 
-## 🚀 Future Improvements
+## 🚀 Future Development
 
 Planned improvements for JagaPokok include:
 
-- Complete the plant identification feature
+- Add community image attachments using Firebase Storage
+- Add a plant growth journal with progress photos
+- Add camera and gallery input for plant identification
+- Integrate AI-assisted plant recognition
 - Improve reminder reliability and notification handling
 - Add search and filtering for the plant database
 - Expand the plant information database
 - Add editing and deletion controls for community posts
-- Improve image compression and upload performance
 - Add stronger form validation and error messages
 - Expand automated tests to more application areas
 - Improve accessibility and responsive layout

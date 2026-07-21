@@ -1,195 +1,77 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import {
-  Alert,
-  Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
 import BackButton from '../components/BackButton';
 import { Colors } from '../constants/Colors';
 
 export default function SnapScreen() {
-  const router = useRouter();
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [identifying, setIdentifying] = useState(false);
-
-  const requestCameraPermission = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Camera permission is required to take photos.'
-      );
-      return false;
-    }
-    return true;
-  };
-
-  const requestGalleryPermission = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permission Required',
-        'Gallery permission is required to select photos.'
-      );
-      return false;
-    }
-    return true;
-  };
-
-  const takePhoto = async () => {
-    const hasPermission = await requestCameraPermission();
-    if (!hasPermission) return;
-
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setSelectedImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error taking photo:', error);
-      Alert.alert('Error', 'Failed to take photo. Please try again.');
-    }
-  };
-
-  const pickFromGallery = async () => {
-    const hasPermission = await requestGalleryPermission();
-    if (!hasPermission) return;
-
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setSelectedImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
-    }
-  };
-
-  const identifyPlant = () => {
-    if (!selectedImage) {
-      Alert.alert('No Image', 'Please take a photo or choose from gallery first.');
-      return;
-    }
-
-    setIdentifying(true);
-    
-    setTimeout(() => {
-      setIdentifying(false);
-      
-      Alert.alert(
-        'Plant Identified!',
-        'This looks like a Snake Plant!',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'View Details', 
-            onPress: () => router.push('/plant-detail?id=snakePlant')
-          }
-        ]
-      );
-    }, 2000);
-  };
-
-  const retakePhoto = () => {
-    setSelectedImage(null);
-  };
-
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <BackButton />
-        <Text style={styles.headerTitle}>Snap to Identify</Text>
-        <View style={{ width: 44 }} />
+        <Text style={styles.headerTitle}>Plant Identification</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
-      {/* Camera Preview or Instructions */}
-      <View style={styles.previewContainer}>
-        {selectedImage ? (
-          <Image source={{ uri: selectedImage }} style={styles.previewImage} />
-        ) : (
-          <View style={styles.instructionsContainer}>
-            <MaterialCommunityIcons name="camera" size={80} color={Colors.primary} />
-            <Text style={styles.instructionsTitle}>
-              Take a Photo or Choose from Gallery
-            </Text>
-            <Text style={styles.instructionsText}>
-              Point your camera at a plant leaf or choose a photo from your gallery to identify it
+      <View style={styles.content}>
+        <View style={styles.iconContainer}>
+          <MaterialCommunityIcons
+            name="camera-outline"
+            size={72}
+            color={Colors.primary}
+          />
+        </View>
+
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>FUTURE DEVELOPMENT</Text>
+        </View>
+
+        <Text style={styles.title}>Plant Identification</Text>
+
+        <Text style={styles.description}>
+          Camera and gallery-based plant identification is planned for a future
+          JagaPokok version.
+        </Text>
+
+        <View style={styles.featureCard}>
+          <Text style={styles.featureCardTitle}>Planned features</Text>
+
+          <View style={styles.featureRow}>
+            <MaterialCommunityIcons
+              name="camera"
+              size={22}
+              color={Colors.primary}
+            />
+            <Text style={styles.featureText}>Camera and gallery image input</Text>
+          </View>
+
+          <View style={styles.featureRow}>
+            <MaterialCommunityIcons
+              name="leaf"
+              size={22}
+              color={Colors.primary}
+            />
+            <Text style={styles.featureText}>AI-assisted plant recognition</Text>
+          </View>
+
+          <View style={styles.featureRow}>
+            <MaterialCommunityIcons
+              name="book-open-outline"
+              size={22}
+              color={Colors.primary}
+            />
+            <Text style={styles.featureText}>
+              Matching results with JagaPokok plant details
             </Text>
           </View>
-        )}
-      </View>
+        </View>
 
-      {/* Action Buttons */}
-      <View style={styles.buttonsContainer}>
-        {selectedImage ? (
-          <>
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={retakePhoto}
-            >
-              <MaterialCommunityIcons name="camera-retake" size={24} color={Colors.text} />
-              <Text style={styles.actionButtonText}>Retake Photo</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.primaryButton]}
-              onPress={identifyPlant}
-              disabled={identifying}
-            >
-              <MaterialCommunityIcons name="magnify" size={24} color={Colors.white} />
-              <Text style={[styles.actionButtonText, styles.primaryButtonText]}>
-                {identifying ? 'Identifying...' : 'Identify Plant'}
-              </Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={pickFromGallery}
-            >
-              <MaterialCommunityIcons name="image" size={24} color={Colors.text} />
-              <Text style={styles.actionButtonText}>Choose from Gallery</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.primaryButton]}
-              onPress={takePhoto}
-            >
-              <MaterialCommunityIcons name="camera" size={24} color={Colors.white} />
-              <Text style={[styles.actionButtonText, styles.primaryButtonText]}>
-                Take Photo
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
-
-      {/* Note */}
-      <View style={styles.noteContainer}>
-        <MaterialCommunityIcons name="lightbulb-on" size={16} color={Colors.textSecondary} />
-        <Text style={styles.note}>
-          Make sure the plant is well-lit and in focus for best results
+        <Text style={styles.releaseNote}>
+          JagaPokok v1.0 focuses on plant care tracking, reminders, and community
+          text posts.
         </Text>
       </View>
     </View>
@@ -215,79 +97,82 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.text,
   },
-  previewContainer: {
+  headerSpacer: {
+    width: 44,
+  },
+  content: {
     flex: 1,
-    margin: 20,
-    borderRadius: 20,
-    backgroundColor: Colors.white,
-    overflow: 'hidden',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 32,
+  },
+  iconContainer: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#E8F5E9',
+    marginBottom: 20,
   },
-  previewImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+  statusBadge: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginBottom: 14,
   },
-  instructionsContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  instructionsTitle: {
-    fontSize: 20,
+  statusText: {
+    color: Colors.primary,
+    fontSize: 12,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  title: {
     color: Colors.text,
+    fontSize: 26,
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
     marginBottom: 10,
   },
-  instructionsText: {
-    fontSize: 14,
+  description: {
     color: Colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 23,
     textAlign: 'center',
-    lineHeight: 22,
+    marginBottom: 24,
   },
-  buttonsContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    gap: 12,
-  },
-  actionButton: {
-    flexDirection: 'row',
+  featureCard: {
+    width: '100%',
     backgroundColor: Colors.white,
-    paddingVertical: 16,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    gap: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: 18,
+    marginBottom: 22,
   },
-  primaryButton: {
-    backgroundColor: Colors.primary,
-  },
-  actionButtonText: {
+  featureCardTitle: {
+    color: Colors.text,
     fontSize: 16,
     fontWeight: 'bold',
-    color: Colors.text,
+    marginBottom: 16,
   },
-  primaryButtonText: {
-    color: Colors.white,
-  },
-  noteContainer: {
+  featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-    gap: 8,
+    marginBottom: 14,
   },
-  note: {
-    fontSize: 12,
-    color: Colors.textSecondary,
+  featureText: {
     flex: 1,
+    color: Colors.text,
+    fontSize: 15,
+    lineHeight: 21,
+    marginLeft: 12,
+  },
+  releaseNote: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
   },
 });

@@ -1,9 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { addDoc, arrayUnion, collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -20,7 +18,7 @@ import {
 } from 'react-native';
 import BackButton from '../components/BackButton';
 import { Colors } from '../constants/Colors';
-import { auth, db, storage } from '../services/firebase';
+import { auth, db } from '../services/firebase';
 
 export default function CommunityScreen() {
   const router = useRouter();
@@ -28,7 +26,6 @@ export default function CommunityScreen() {
   const [loading, setLoading] = useState(true);
   const [newPostText, setNewPostText] = useState('');
   const [posting, setPosting] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [likedPosts, setLikedPosts] = useState({}); // Track liked posts
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -97,96 +94,12 @@ export default function CommunityScreen() {
     }
   };
 
-  // 2. FIX IMAGE ATTACHMENT: Access camera/gallery
-  const handleAttachImage = async () => {
+  // Image attachments are planned for a future version
+  const handleAttachImage = () => {
     Alert.alert(
-      'Attach Image',
-      'Choose image source',
-      [
-        {
-          text: 'Take Photo',
-          onPress: () => takePhoto()
-        },
-        {
-          text: 'Choose from Gallery',
-          onPress: () => pickImageFromGallery()
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel'
-        }
-      ]
+      'Future Development',
+      'Image attachments will be added in a future version.'
     );
-  };
-
-  const takePhoto = async () => {
-    try {
-      // Request camera permissions
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Camera permission is needed to take photos');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.7,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setSelectedImage(result.assets[0].uri);
-        Alert.alert('Success', 'Photo taken and attached!');
-      }
-    } catch (error) {
-      console.error('Error taking photo:', error);
-      Alert.alert('Error', 'Failed to take photo. Please try again.');
-    }
-  };
-
-  const pickImageFromGallery = async () => {
-    try {
-      // Request media library permissions
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Required', 'Gallery permission is needed to select photos');
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.7,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setSelectedImage(result.assets[0].uri);
-        Alert.alert('Success', 'Image selected and attached!');
-      }
-    } catch (error) {
-      console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
-    }
-  };
-
-  const uploadImageToFirebase = async (localUri, userId) => {
-    try {
-      const response = await fetch(localUri);
-      const blob = await response.blob();
-      const filename = `community/${userId}/${Date.now()}.jpg`;
-      const storageRef = ref(storage, filename);
-      const uploadResult = await uploadBytes(storageRef, blob);
-
-      return await getDownloadURL(uploadResult.ref);
-    } catch (error) {
-      console.error('Error uploading image:', {
-        code: error?.code,
-        message: error?.message,
-      });
-      throw error;
-    }
   };
 
 const handleCreatePost = async () => {
@@ -206,12 +119,6 @@ const handleCreatePost = async () => {
       return;
     }
 
-    // Handle image upload
-    let imageUrl = null;
-    if (selectedImage) {
-      imageUrl = await uploadImageToFirebase(selectedImage, userId);
-    }
-
     // Create post object
     const newPost = {
       username: userName,
@@ -221,7 +128,7 @@ const handleCreatePost = async () => {
       likes: 0,
       comments: [],
       likedBy: [],
-      image: imageUrl,
+      image: null,
       userId: userId,
     };
 
@@ -238,7 +145,6 @@ const handleCreatePost = async () => {
 
     setPosts([postWithId, ...posts]);
     setNewPostText('');
-    setSelectedImage(null);
     
     Alert.alert('Success', 'Your post has been shared!');
     
@@ -521,38 +427,23 @@ const handleCreatePost = async () => {
           value={newPostText}
           onChangeText={setNewPostText}
         />
-        
-        {selectedImage && (
-          <View style={styles.selectedImageContainer}>
-            <Image source={{ uri: selectedImage }} style={styles.selectedImagePreview} />
-            <TouchableOpacity 
-              style={styles.removeImageButton}
-              onPress={() => setSelectedImage(null)}
-            >
-              <MaterialCommunityIcons name="close-circle" size={24} color={Colors.error} />
-            </TouchableOpacity>
-          </View>
-        )}
-        
+
         <View style={styles.newPostActions}>
           {/* Image Attach Button */}
           <TouchableOpacity 
             style={styles.attachIconButton}
             onPress={handleAttachImage}
           >
-            <MaterialCommunityIcons 
-              name={selectedImage ? "image" : "image-plus"} 
-              size={24} 
-              color={selectedImage ? Colors.success : Colors.primary} 
+            <MaterialCommunityIcons
+              name="image-plus"
+              size={24}
+              color={Colors.primary}
             />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.cancelButton}
-            onPress={() => {
-              setNewPostText('');
-              setSelectedImage(null);
-            }}
+            onPress={() => setNewPostText('')}
           >
             <Text style={styles.cancelButtonText}>Clear</Text>
           </TouchableOpacity>
@@ -734,22 +625,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
-  },
-  selectedImageContainer: {
-    position: 'relative',
-    marginBottom: 10,
-  },
-  selectedImagePreview: {
-    width: '100%',
-    height: 150,
-    borderRadius: 8,
-  },
-  removeImageButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 15,
   },
   newPostActions: {
     flexDirection: 'row',
