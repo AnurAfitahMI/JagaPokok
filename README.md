@@ -2,7 +2,7 @@
 
 ## Overview
 
-JagaPokok is a cross-platform indoor plant care application built with React Native, Expo, Firebase Authentication, Cloud Firestore, and Firebase Storage.
+JagaPokok is a cross-platform indoor plant care application built with React Native, Expo, Firebase Authentication, and Cloud Firestore.
 
 The application helps users manage indoor plants through personalized plant tracking, intelligent care reminders, and growth monitoring. It combines practical plant care information with a simple and intuitive mobile experience for both beginners and plant enthusiasts.
 
@@ -10,7 +10,7 @@ The application helps users manage indoor plants through personalized plant trac
 
 I enjoy gardening and caring for indoor plants, but I often found myself forgetting when I last watered or fertilized them. As my collection grew, it became difficult to keep track of each plant's care schedule and monitor their growth over time.
 
-JagaPokok was created to solve that problem. My goal was to build a simple and practical mobile application that helps plant owners organize plant care, receive timely reminders, and document each plant's growth journey in one place.
+JagaPokok was created to solve that problem. My goal was to build a simple and practical mobile application that helps plant owners organize plant care and manage care reminders in one place.
 
 ## Features
 
@@ -18,15 +18,14 @@ JagaPokok was created to solve that problem. My goal was to build a simple and p
 - 📚 Scientific and common plant names
 - 🌿 Basic care guides for each plant
 - 💚 Plant benefits and companion suggestions
-- 👤 Personal plant collection
+- 👤 Personal MyPokok plant collection
 - ⏰ Automatic care reminders based on plant requirements
 - ⚙️ Custom reminder scheduling
-- 📷 Photo gallery to document plant growth over time
-- 📈 Track plant growth over time
-- 🌍 Community platform for sharing plant care experiences
-- ❤️ Like, comment, and interact with other users
-- 🔍 Plant identification using the camera (Work in Progress)
-- 🧪 Jest unit tests for reminder calculations, plant classification, and user utilities
+- 🌍 Community platform for text-based plant care posts
+- ❤️ Like, comment, and share community posts
+- 🔐 Persistent Firebase anonymous authentication
+- 🔒 Tested Firestore security rules
+- 🧪 Jest unit tests and Firestore security-rule integration tests
 
 ## Screenshots
 
@@ -74,7 +73,6 @@ The screenshots below show the main JagaPokok user journey, including plant disc
 | Expo                    | Development framework             |
 | Firebase Authentication | User authentication               |
 | Cloud Firestore         | Database                          |
-| Firebase Storage        | Store uploaded plant images       |
 | JavaScript              | Application development           |
 | Expo Router             | Navigation                        |
 
