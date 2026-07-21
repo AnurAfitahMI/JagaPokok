@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 export default function BackButton() {
   const router = useRouter();
@@ -15,12 +15,3 @@ export default function BackButton() {
 </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  backButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

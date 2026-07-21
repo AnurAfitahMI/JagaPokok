@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -24,11 +24,7 @@ export default function PlantDetailScreen() {
   const [plant, setPlant] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPlantDetails();
-  }, [id]);
-
-  const fetchPlantDetails = async () => {
+  const fetchPlantDetails = useCallback(async () => {
     try {
       console.log('Fetching plant details for ID:', id);
       
@@ -53,7 +49,11 @@ export default function PlantDetailScreen() {
       console.error('Error fetching plant details:', error);
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchPlantDetails();
+  }, [fetchPlantDetails]);
 
   // Save plant to MyPokok in Firestore
   const handleAddToMyPokok = async () => {

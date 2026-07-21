@@ -23,7 +23,7 @@ export default function Index() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   if (checking) {
     return (

@@ -56,7 +56,7 @@ export default function ReminderCard({ reminder, onComplete, onSnooze }: Reminde
           month: 'short',
         });
       }
-    } catch (error) {
+    } catch {
       return 'Soon';
     }
   };
@@ -64,7 +64,7 @@ export default function ReminderCard({ reminder, onComplete, onSnooze }: Reminde
   const isOverdue = () => {
     try {
       return new Date(reminder.nextDate) < new Date();
-    } catch (error) {
+    } catch {
       return false;
     }
   };

@@ -1,3 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Application from 'expo-application';
+import { Platform } from 'react-native';
+import {
+  generateDeviceId,
+  getUserId,
+  getUserName,
+} from '../../services/userService';
+
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
   default: {
@@ -18,15 +27,6 @@ jest.mock('react-native', () => ({
     OS: 'ios',
   },
 }));
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Application from 'expo-application';
-import { Platform } from 'react-native';
-import {
-  generateDeviceId,
-  getUserId,
-  getUserName,
-} from '../../services/userService';
 
 const mockGetItem = AsyncStorage.getItem as jest.Mock;
 const mockGetIosIdForVendor =

@@ -13,7 +13,7 @@ export default function SplashScreen() {
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [router]);
 
   return (
     <View style={styles.container}>

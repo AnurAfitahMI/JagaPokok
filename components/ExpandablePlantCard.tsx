@@ -26,7 +26,7 @@ interface ExpandablePlantCardProps {
     scientificName?: string;
     imageUrl?: string;
     addedAt?: string;
-    reminders?: Array<{
+    reminders?: {
       id: string;
       type: string;
       title: string;
@@ -35,7 +35,7 @@ interface ExpandablePlantCardProps {
       notes?: string;
       icon?: string;
       isEnabled: boolean;
-    }>;
+    }[];
   };
   onPress: () => void;
   onDelete: () => void;
@@ -106,7 +106,7 @@ export default function ExpandablePlantCard({
         const diffDays = Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         return `In ${diffDays} days`;
       }
-    } catch (error) {
+    } catch {
       return 'Soon';
     }
   };

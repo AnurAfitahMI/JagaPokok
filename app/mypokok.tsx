@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Alert,
   Animated,
@@ -56,18 +56,18 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
     if (reminder.isOverdue) return 'Overdue';
     if (reminder.isToday) return 'Today';
     if (reminder.isTomorrow) return 'Tomorrow';
-    
+
     // For dates more than 2 days away, show short date
-    return nextDate.toLocaleDateString('en-MY', { 
-      month: 'short', 
-      day: 'numeric' 
+    return nextDate.toLocaleDateString('en-MY', {
+      month: 'short',
+      day: 'numeric'
     });
   };
 
-  
+
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[
         styles.plantCard,
         expanded && styles.plantCardExpanded,
@@ -81,8 +81,8 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
         <View style={styles.plantInfoRow}>
           <View style={styles.plantImageContainer}>
             {plant.imageUrl ? (
-              <Image 
-                source={{ uri: plant.imageUrl }} 
+              <Image
+                source={{ uri: plant.imageUrl }}
                 style={styles.plantImage}
               />
             ) : (
@@ -91,7 +91,7 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
               </View>
             )}
           </View>
-          
+
           <View style={styles.plantDetails}>
             <Text style={styles.plantName}>{plant.name}</Text>
             {plant.scientificName && (
@@ -103,7 +103,7 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
               </Text>
             )}
           </View>
-          
+
           <View style={styles.plantActions}>
   {urgentReminders.length > 0 && (
     <View style={[
@@ -111,10 +111,10 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
       urgentReminders.some(r => r.isOverdue) && styles.reminderIndicatorUrgent,
       urgentReminders.some(r => r.isToday) && styles.reminderIndicatorToday
     ]}>
-      <MaterialCommunityIcons 
-        name={urgentReminders.some(r => r.isOverdue) ? "alert-circle" : "bell-alert"} 
-        size={16} 
-        color={urgentReminders.some(r => r.isOverdue) ? Colors.error : Colors.primary} 
+      <MaterialCommunityIcons
+        name={urgentReminders.some(r => r.isOverdue) ? "alert-circle" : "bell-alert"}
+        size={16}
+        color={urgentReminders.some(r => r.isOverdue) ? Colors.error : Colors.primary}
       />
       <Text style={[
         styles.reminderCount,
@@ -124,10 +124,10 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
       </Text>
     </View>
   )}
-  <MaterialCommunityIcons 
-    name={expanded ? "chevron-up" : "chevron-down"} 
-    size={24} 
-    color={Colors.textSecondary} 
+  <MaterialCommunityIcons
+    name={expanded ? "chevron-up" : "chevron-down"}
+    size={24}
+    color={Colors.textSecondary}
   />
 </View>
 </View>
@@ -146,10 +146,10 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
                 onPress={() => onCompleteReminder && onCompleteReminder(reminder.id)}
                 activeOpacity={0.6}
               >
-                <MaterialCommunityIcons 
-                  name={getReminderIcon(reminder)} 
-                  size={14} 
-                  color={reminder.isOverdue ? Colors.error : Colors.primary} 
+                <MaterialCommunityIcons
+                  name={getReminderIcon(reminder)}
+                  size={14}
+                  color={reminder.isOverdue ? Colors.error : Colors.primary}
                 />
                 <Text style={styles.reminderDateCompact}>
                   {formatReminderDate(reminder)}
@@ -183,15 +183,15 @@ const ExpandablePlantCard = ({ plant, urgentReminders, onPress, onDelete, onComp
 
             {/* Action buttons */}
             <View style={styles.actionButtons}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.actionButton, styles.viewButton]}
                 onPress={onPress}
               >
                 <MaterialCommunityIcons name="eye" size={20} color={Colors.primary} />
                 <Text style={styles.viewButtonText}>View Details</Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 style={[styles.actionButton, styles.deleteButton]}
                 onPress={onDelete}
               >
@@ -218,7 +218,7 @@ export default function MyPokokScreen() {
   const [selectedReminder, setSelectedReminder] = useState(null);
   const [selectedPlant, setSelectedPlant] = useState(null);
   const fadeAnim = useState(new Animated.Value(0))[0];
-  
+
   // Stats state
   const [stats, setStats] = useState({
     totalPlants: 0,
@@ -227,70 +227,7 @@ export default function MyPokokScreen() {
     achievements: 0,
   });
 
-  useEffect(() => {
-    fetchMyPlants();
-  }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchMyPlants();
-      
-      // Cleanup if needed
-      return () => {
-        // Cleanup code here
-      };
-    }, [])
-  );
-
-  const fetchMyPlants = async () => {
-    try {
-      setError(null);
-      const userId = await AsyncStorage.getItem('userId');
-if (!userId) {
-  console.log('No user found');
-  setMyPlants([]);
-  setLoading(false);
-  return;
-}
-
-      const mypokokRef = collection(db, 'users', userId, 'mypokok');
-      const q = query(mypokokRef, orderBy('addedAt', 'desc'));
-      const snapshot = await getDocs(q);
-    
-      const plantsList = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          // Ensure reminders array exists
-          reminders: data.reminders || [],
-          // Ensure careData exists for backward compatibility
-          careData: data.careData || {
-            waterNeeds: data.waterNeeds || 'Moderate',
-            repottingFrequency: data.repottingFrequency || 'Every 1-2 years',
-          }
-        };
-      });
-
-      setMyPlants(plantsList);
-      calculateStats(plantsList);
-      setLoading(false);
-      setRefreshing(false);
-      
-      // Fade in animation
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-
-    } catch (error) {
-      console.error('Error fetching MyPokok plants:', error);
-      setError('Failed to load plants. Please try again.');
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
 
   // Get urgent reminders for a specific plant (1-2 most urgent)
   const getUrgentRemindersForPlant = (plant) => {
@@ -313,7 +250,7 @@ if (!userId) {
         const isToday = nextDate.toDateString() === today.toDateString();
         const isTomorrow = nextDate.toDateString() === tomorrow.toDateString();
         const isWithin3Days = nextDate <= threeDaysFromNow;
-        
+
         // Calculate urgency score (lower = more urgent)
         let urgencyScore = 0;
         if (isOverdue) urgencyScore = 1;
@@ -343,7 +280,7 @@ if (!userId) {
     return urgentReminders;
   };
 
-  const calculateStats = (plants) => {
+  const calculateStats = useCallback((plants) => {
     let totalPlants = plants.length;
     let upcomingTasks = 0;
     let urgentTasks = 0;
@@ -358,14 +295,14 @@ if (!userId) {
             const today = new Date();
             const threeDaysFromNow = new Date(today);
             threeDaysFromNow.setDate(today.getDate() + 3);
-            
+
             if (nextDate <= threeDaysFromNow) {
               upcomingTasks++;
-              
+
               // Check if overdue or within 24 hours
               const isOverdue = nextDate < today;
               const isWithin24Hours = (nextDate - today) <= (24 * 60 * 60 * 1000);
-              
+
               if (isOverdue || isWithin24Hours || reminder.priority === 'high') {
                 urgentTasks++;
               }
@@ -386,7 +323,63 @@ if (!userId) {
       urgentTasks,
       achievements,
     });
-  };
+  }, []);
+
+  const fetchMyPlants = useCallback(async () => {
+    try {
+      setError(null);
+      const userId = await AsyncStorage.getItem('userId');
+if (!userId) {
+  console.log('No user found');
+  setMyPlants([]);
+  setLoading(false);
+  return;
+}
+
+      const mypokokRef = collection(db, 'users', userId, 'mypokok');
+      const q = query(mypokokRef, orderBy('addedAt', 'desc'));
+      const snapshot = await getDocs(q);
+
+      const plantsList = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // Ensure reminders array exists
+          reminders: data.reminders || [],
+          // Ensure careData exists for backward compatibility
+          careData: data.careData || {
+            waterNeeds: data.waterNeeds || 'Moderate',
+            repottingFrequency: data.repottingFrequency || 'Every 1-2 years',
+          }
+        };
+      });
+
+      setMyPlants(plantsList);
+      calculateStats(plantsList);
+      setLoading(false);
+      setRefreshing(false);
+
+      // Fade in animation
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+
+    } catch (error) {
+      console.error('Error fetching MyPokok plants:', error);
+      setError('Failed to load plants. Please try again.');
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [calculateStats, fadeAnim]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyPlants();
+    }, [fetchMyPlants])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -401,7 +394,7 @@ if (!userId) {
 
   const confirmDeletePlant = async () => {
   if (!plantToDelete) return;
-  
+
   try {
     // Get userId from AsyncStorage (same as fetchMyPlants)
     const userId = await AsyncStorage.getItem('userId');
@@ -412,16 +405,16 @@ if (!userId) {
 
     // Delete from Firestore
     await deleteDoc(doc(db, 'users', userId, 'mypokok', plantToDelete.id));
-    
+
     // Update local state immediately
     const updatedPlants = myPlants.filter(plant => plant.id !== plantToDelete.id);
     setMyPlants(updatedPlants);
-    
+
     // Recalculate stats with updated plants
     calculateStats(updatedPlants);
-    
+
     Alert.alert('Success', `${plantToDelete.name} has been removed from MyPokok!`);
-    
+
   } catch (error) {
     console.error('Error deleting plant:', error);
     Alert.alert('Error', 'Failed to delete plant. Please try again.');
@@ -430,11 +423,6 @@ if (!userId) {
     setPlantToDelete(null);
   }
 };
-
-  const cancelDelete = () => {
-    setDeleteModalVisible(false);
-    setPlantToDelete(null);
-  };
 
   // Reminder Functions
   const handleReminderPress = (reminder, plant) => {
@@ -457,12 +445,12 @@ if (!userId) {
 
       // Update reminder in Firestore
       const plantRef = doc(db, 'users', user.uid, 'mypokok', selectedPlant.id);
-      const updatedReminders = selectedPlant.reminders.map(reminder => 
-        reminder.id === selectedReminder.id 
-          ? { 
-              ...reminder, 
+      const updatedReminders = selectedPlant.reminders.map(reminder =>
+        reminder.id === selectedReminder.id
+          ? {
+              ...reminder,
               lastCompleted: new Date().toISOString(),
-              nextDate: newNextDate 
+              nextDate: newNextDate
             }
           : reminder
       );
@@ -509,8 +497,8 @@ if (!userId) {
 
       // Update reminder in Firestore
       const plantRef = doc(db, 'users', user.uid, 'mypokok', selectedPlant.id);
-      const updatedReminders = selectedPlant.reminders.map(reminder => 
-        reminder.id === selectedReminder.id 
+      const updatedReminders = selectedPlant.reminders.map(reminder =>
+        reminder.id === selectedReminder.id
           ? { ...reminder, nextDate: newNextDate }
           : reminder
       );
@@ -556,7 +544,7 @@ if (!userId) {
   // Render Plant Card
   const renderPlantCard = ({ item }) => {
     const urgentReminders = getUrgentRemindersForPlant(item);
-    
+
     return (
       <ExpandablePlantCard
         plant={item}
@@ -607,8 +595,8 @@ if (!userId) {
     ];
 
     return (
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.statsCarousel}
       >
@@ -618,10 +606,10 @@ if (!userId) {
             { backgroundColor: stat.color + '45' }
           ]}>
             <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons 
-                name={stat.icon} 
-                size={24} 
-                color={stat.color} 
+              <MaterialCommunityIcons
+                name={stat.icon}
+                size={24}
+                color={stat.color}
               />
             </View>
             <Text style={[styles.statNumber, { color: stat.color }]}>
@@ -650,7 +638,7 @@ if (!userId) {
           <View style={styles.skeletonStats}>
             <View style={[styles.skeletonStatBox, styles.shimmer]} />
           </View>
-          
+
           <FlatList
             data={[1, 2, 3]}
             renderItem={renderSkeleton}
@@ -672,12 +660,12 @@ if (!userId) {
           <Text style={styles.headerTitle}>MyPokok</Text>
           <View style={{ width: 70 }} />
         </View>
-        
+
         <View style={styles.errorContainer}>
           <MaterialCommunityIcons name="alert-circle-outline" size={80} color={Colors.error} />
           <Text style={styles.errorTitle}>Oops!</Text>
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.retryButton}
             onPress={fetchMyPlants}
           >
@@ -695,9 +683,9 @@ if (!userId) {
       <View style={styles.header}>
         <BackButton />
         <Text style={styles.headerTitle}>MyPokok</Text>
-        
+
         {/* Home Button - NEW */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.homeButton}
           onPress={() => router.replace('/(tabs)')}
         >
@@ -717,7 +705,7 @@ if (!userId) {
           <Text style={styles.emptyText}>
             Start building your plant collection!
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.addPlantButton}
             onPress={() => router.push('/search')}
           >
@@ -731,7 +719,7 @@ if (!userId) {
             <>
               {/* Stats Carousel */}
               {renderStatsCarousel()}
-              
+
               {/* My Plants Section */}
               <View style={styles.plantsSection}>
                 <View style={styles.sectionHeader}>
@@ -768,40 +756,40 @@ if (!userId) {
   animationType="fade"
   onRequestClose={() => setDeleteModalVisible(false)}
 >
-  <TouchableOpacity 
+  <TouchableOpacity
     style={styles.modalOverlay}
     activeOpacity={1}
     onPress={() => setDeleteModalVisible(false)}
   >
-    <TouchableOpacity 
+    <TouchableOpacity
       activeOpacity={1}
       onPress={(e) => e.stopPropagation()}
     >
       <View style={styles.modalContainer}>
         {/* Header with Icon and Title side by side */}
         <View style={styles.modalHeaderRow}>
-          <MaterialCommunityIcons 
-            name="alert-circle" 
-            size={48} 
-            color={Colors.error} 
+          <MaterialCommunityIcons
+            name="alert-circle"
+            size={48}
+            color={Colors.error}
           />
           <Text style={styles.modalTitleLeft}>Remove Plant</Text>
         </View>
-        
+
         <Text style={styles.modalText}>
           Are you sure you want to remove "{plantToDelete?.name}" from your collection?
         </Text>
 
         {/* FIXED: Changed from modalButtonSmall to modalButtons for the container */}
         <View style={styles.modalButtons}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.modalButton, styles.cancelButton]}
             onPress={() => setDeleteModalVisible(false)}
           >
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.modalButton, styles.deleteButtonModal]}
             onPress={confirmDeletePlant}
           >
@@ -825,10 +813,10 @@ if (!userId) {
     <View style={styles.modalContainer}>
       {/* Icon + Title - Left aligned */}
       <View style={styles.modalHeaderRow}>
-        <MaterialCommunityIcons 
-          name={getReminderIcon(selectedReminder)} 
-          size={40} 
-          color={Colors.primary} 
+        <MaterialCommunityIcons
+          name={getReminderIcon(selectedReminder)}
+          size={40}
+          color={Colors.primary}
         />
         <Text style={styles.modalTitleLeft}>
           {selectedReminder?.title || 'Reminder'}
@@ -842,14 +830,14 @@ if (!userId) {
 
       {/* Action Buttons - Smaller */}
       <View style={styles.modalButtonsCompact}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.modalButtonSmall, styles.cancelButtonSmall]}
           onPress={() => setReminderModalVisible(false)}
         >
           <Text style={styles.cancelButtonTextSmall}>Cancel</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={[styles.modalButtonSmall, styles.completeButtonSmall]}
           onPress={handleCompleteReminder}
         >
@@ -858,7 +846,7 @@ if (!userId) {
       </View>
 
       {/* Snooze Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.snoozeButton}
         onPress={() => handleSnoozeReminder(24)}
       >
@@ -943,7 +931,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  
+
   // Sections
   plantsSection: {
     paddingHorizontal: 20,
@@ -975,7 +963,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-  
+
   // Plant Card Styles
   plantCard: {
     flexDirection: 'row',
@@ -1106,7 +1094,7 @@ reminderIndicatorToday: {
     color: Colors.text,
     fontWeight: '500',
   },
-  
+
   // Expanded Content
   expandedContent: {
     marginTop: 16,
@@ -1162,12 +1150,12 @@ reminderIndicatorToday: {
     color: Colors.text,
     fontWeight: '500',
   },
-  
+
   // List container
   listContainer: {
     paddingBottom: 20,
   },
-  
+
   // Loading skeleton styles
   skeletonContainer: {
     flex: 1,
@@ -1217,7 +1205,7 @@ reminderIndicatorToday: {
     overflow: 'hidden',
     position: 'relative',
   },
-  
+
   // Error state
   errorContainer: {
     flex: 1,
@@ -1253,7 +1241,7 @@ reminderIndicatorToday: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  
+
   // Empty state
   emptyContainer: {
     flex: 1,
@@ -1287,7 +1275,7 @@ reminderIndicatorToday: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  
+
   // Modal styles
   modalOverlay: {
     flex: 1,
