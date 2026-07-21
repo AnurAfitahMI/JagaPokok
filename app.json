@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "JagaPokok3",
-    "slug": "JagaPokok3",
+    "name": "JagaPokok",
+    "slug": "jagapokok",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "jagapokok3",
+    "scheme": "jagapokok",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
