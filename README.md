@@ -2,7 +2,7 @@
 
 ## Overview
 
-JagaPokok is a cross-platform indoor plant care application built with React Native, Expo, Firebase Authentication, and Cloud Firestore.
+JagaPokok is a cross-platform indoor plant care application built with React Native, Expo SDK 53, TypeScript, JavaScript, Firebase Authentication, and Cloud Firestore.
 
 The application helps users manage indoor plants through personal plant collections and intelligent care reminders. It combines practical plant care information with a simple and intuitive mobile experience for both beginners and plant enthusiasts.
 
@@ -67,14 +67,16 @@ The screenshots below show the main JagaPokok user journey, including plant disc
 
 ## 🛠 Tech Stack
 
-| Technology              | Purpose                           |
-| ----------------------- | --------------------------------- |
-| React Native            | Cross-platform mobile development |
-| Expo                    | Development framework             |
-| Firebase Authentication | User authentication               |
-| Cloud Firestore         | Database                          |
-| JavaScript              | Application development           |
-| Expo Router             | Navigation                        |
+| Technology                 | Purpose                                     |
+| -------------------------- | ------------------------------------------  |
+| React Native 0.79          | Cross-platform mobile development           |
+| Expo SDK 53                | Application framework and development tools |
+| Expo Router 5              | File-based navigation                       |
+| TypeScript and JavaScript  | Application development                     |
+| Firebase Authentication    | Persistent anonymous authentication         |
+| Cloud Firestore            | Application database                        |
+| Jest                       | Unit testing                                |
+| Firebase Emulator Suite    | Firestore security-rule integration testing |
 
 ## 🏗 Application Architecture
 
@@ -115,8 +117,6 @@ JagaPokok/
 │   └── screenshots/       # Screenshots used in this README
 ├── components/            # Reusable user interface components
 ├── constants/             # Shared constants and configuration values
-├── hooks/                 # Custom React hooks
-├── scripts/               # Project utility scripts
 ├── services/              # Firebase and application service modules
 ├── app.json               # Expo application configuration
 ├── jest.config.js         # Jest test configuration
@@ -124,7 +124,7 @@ JagaPokok/
 └── README.md              # Project documentation
 ```
 
-The project separates Expo Router pages, reusable interface components, custom hooks, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
+The project separates Expo Router pages, reusable interface components, shared constants, and service modules. This structure keeps Firebase operations and application logic separate from the user interface.
 
 ## ⚙️ Installation
 
@@ -170,13 +170,32 @@ npx expo start
 
 A Firebase project and valid Firebase configuration are required for authentication and database features.
 
+## ✅ Testing and Validation
+
+Run the project checks with:
+
+```bash
+npm test -- --runInBand
+npm run lint
+npm run test:rules
+npx expo-doctor
+```
+
+Latest verified results:
+
+- 3 Jest test suites passed with 51 tests
+- 6 Firestore security-rule integration tests passed
+- Expo Doctor passed all 18 checks
+- Android regression testing passed on a Pixel 7 API 34 emulator with Expo SDK 53
+- No open critical or high-severity Dependabot alerts
+
 ## 💡 Lessons Learned
 
 Building JagaPokok independently gave me experience across the full mobile application development process, from planning and database design to implementation, testing, debugging, and documentation.
 
 Through this project, I learned how to:
 
-- Structure a React Native application using reusable components, Expo Router routes, hooks, and service modules
+- Structure a React Native application using reusable components, Expo Router routes, shared constants, and service modules
 - Design and manage data using Cloud Firestore
 - Implement persistent anonymous authentication and Cloud Firestore data operations
 - Build automatic and customizable plant care reminders
